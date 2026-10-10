@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ΟΣΣ1 ΔΕΟ13</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:wght@600;700&display=swap">
+<style>
+/* Layout: sidebar of topics (grouped like the meeting) + one lab per topic: chart, sliders, live readout, how-to steps, zoom; plus an independent quiz tab. */
+:root{
+  --bg:#EEF3F9; --surface:#FFFFFF; --ink:#0E1A2B; --ink2:#51627A; --line:#D3DDEA; --grid:#E4EBF4;
+  --blue:#0B5CA8; --blue-soft:#DCEAF8; --red:#C23B2E; --red-soft:#F8E1DE;
+  --green:#1B8A57; --green-soft:#DCF2E6; --amber:#A8700F; --chip:#E3ECF7;
+  --serif:'Source Serif 4',Georgia,'Times New Roman',serif;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0B1320; --surface:#121D2F; --ink:#E8EFF8; --ink2:#9BAEC8; --line:#26354D; --grid:#1B283D;
+  --blue:#62AAF2; --blue-soft:#17304F; --red:#F28A7E; --red-soft:#3D2227;
+  --green:#4FC48B; --green-soft:#15352B; --amber:#E6B04B; --chip:#1A2A43; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B1320; --surface:#121D2F; --ink:#E8EFF8; --ink2:#9BAEC8; --line:#26354D; --grid:#1B283D;
+  --blue:#62AAF2; --blue-soft:#17304F; --red:#F28A7E; --red-soft:#3D2227;
+  --green:#4FC48B; --green-soft:#15352B; --amber:#E6B04B; --chip:#1A2A43; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--sans);padding-inline:16px;padding-block:20px 40px}
+.app{max-width:1180px;margin-inline:auto;display:flex;flex-direction:column;gap:18px}
+
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 20px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:6px 8px 6px 16px}
+.brand{font:600 16px var(--serif);color:var(--ink);text-decoration:none;display:flex;align-items:baseline;gap:10px}
+.brand small{font:500 11px var(--mono);letter-spacing:.14em;color:var(--blue)}
+.oss{display:flex;gap:4px;overflow-x:auto;max-width:100%}
+.oss a{padding:8px 14px;border-radius:8px;color:var(--ink);text-decoration:none;font:500 13px var(--mono);letter-spacing:.04em;white-space:nowrap}
+.oss a:hover{background:var(--chip)} .oss a[aria-current="page"]{background:var(--blue);color:#fff;font-weight:600}
+.oss a:focus-visible,.brand:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+header{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between}
+.eyebrow{font:500 12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--blue)}
+h1{font:700 clamp(24px,4vw,34px)/1.15 var(--serif);margin:4px 0 6px;text-wrap:balance}
+.sub{color:var(--ink2);max-width:60ch;margin:0}
+.score{font:500 13px var(--mono);color:var(--ink2);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 14px;white-space:nowrap}
+.score b{color:var(--green)}
+.shell{display:grid;grid-template-columns:230px minmax(0,1fr);gap:20px;align-items:start}
+nav{display:flex;flex-direction:column;gap:2px;position:sticky;top:76px}
+.grp{font:500 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink2);margin:14px 0 4px 10px}
+.grp:first-child{margin-top:0}
+nav button{all:unset;box-sizing:border-box;cursor:pointer;padding:8px 10px;border-radius:8px;color:var(--ink);display:flex;justify-content:space-between;align-items:center;gap:8px}
+nav button:hover{background:var(--chip)}
+nav button[aria-current="true"]{background:var(--blue);color:#fff;font-weight:600}
+nav button:focus-visible,.seg button:focus-visible,.btn:focus-visible,input[type=range]:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.lab{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:18px;min-width:0}
+.lab h2{font:700 24px/1.2 var(--serif);margin:0;text-wrap:balance}
+.lead{margin:6px 0 0;color:var(--ink2);max-width:68ch}
+.work{display:grid;grid-template-columns:minmax(250px,300px) minmax(0,1fr);gap:22px;align-items:start}
+.panel{display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel h3{font:500 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink2);margin:0}
+.ctl{display:flex;flex-direction:column;gap:4px}
+.ctl label{display:flex;justify-content:space-between;gap:8px;font-size:14px}
+.ctl output{font:500 14px var(--mono);color:var(--blue)}
+input[type=range]{width:100%;accent-color:var(--blue);margin:0;min-height:24px}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button,.btn{all:unset;box-sizing:border-box;cursor:pointer;padding:6px 12px;border-radius:8px;border:1px solid var(--line);font-size:13px;background:var(--surface)}
+.seg button:hover,.btn:hover{border-color:var(--blue)}
+.seg button[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:600}
+.plotwrap{min-width:0}
+svg.plot{width:100%;height:auto;display:block;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+svg text{font-family:var(--mono)}
+.read{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.tile{background:var(--chip);border-radius:10px;padding:10px 12px;min-width:0}
+.tile span{display:block;font:500 12px var(--mono);color:var(--ink2)}
+sup{font-size:.72em;line-height:0}
+.rad{white-space:nowrap}
+.rb{display:inline-block;border-top:1.6px solid currentColor;padding:1px .25em 0 .2em;margin-left:.05em;line-height:1.15}
+.tile b{display:block;font:500 17px var(--mono);margin-top:2px;overflow-wrap:anywhere}
+.tile.good b{color:var(--green)} .tile.bad b{color:var(--red)} .tile.warn b{color:var(--amber)}
+.explain{background:var(--blue-soft);border-radius:10px;padding:12px 14px;margin:0;overflow-wrap:anywhere}
+.explain p{margin:0} .explain p+p{margin-top:6px}
+.explain code,.lead code{font:500 13.5px var(--mono)}
+.steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:3px}
+.steps li::marker{color:var(--blue);font-family:var(--mono)}
+.chip{display:inline-block;font:500 12px var(--mono);padding:3px 10px;border-radius:999px;background:var(--chip)}
+.chip.good{background:var(--green-soft);color:var(--green)} .chip.bad{background:var(--red-soft);color:var(--red)} .chip.warn{background:var(--blue-soft);color:var(--blue)}
+footer{font-size:12.5px;color:var(--ink2)}
+svg.plot{touch-action:none;cursor:grab} svg.plot:active{cursor:grabbing}
+.plotwrap{position:relative}
+.zoombar{position:absolute;top:8px;right:8px;display:flex;gap:4px;z-index:2}
+.zoombar button{all:unset;box-sizing:border-box;cursor:pointer;min-width:32px;height:32px;display:grid;place-items:center;border-radius:8px;background:var(--surface);border:1px solid var(--line);font:500 16px var(--mono);color:var(--ink)}
+.zoombar button:hover{border-color:var(--blue);color:var(--blue)} .zoombar button:focus-visible{outline:2px solid var(--blue)}
+.hint{font-size:12.5px;color:var(--ink2);margin:6px 2px 0}
+.howto{background:var(--chip);border-radius:10px;padding:12px 16px}
+.howto b,.explain h3.eh{display:block;font:500 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin:0 0 6px}
+.explain h3.eh{margin-bottom:8px}
+.qtop{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+.qcard{border:1px solid var(--line);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:16px;background:var(--surface)}
+.qq{font:600 20px/1.45 var(--serif);margin:0;overflow-wrap:anywhere}
+.qq code{font:500 17px var(--mono);background:var(--chip);padding:4px 6px 2px;border-radius:6px}
+.qform{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.qform .f{display:flex;flex-direction:column;gap:4px;flex:1 1 220px;min-width:0}
+.qform label{font-size:13px;color:var(--ink2)}
+.qform input{font:500 18px var(--mono);padding:9px 12px;border-radius:8px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);min-width:0;width:100%}
+.qform input:focus-visible{outline:2px solid var(--blue);border-color:var(--blue)}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:600;padding:9px 18px;font-size:14px}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+.opts button{all:unset;box-sizing:border-box;cursor:pointer;padding:11px 14px;border-radius:8px;border:1.5px solid var(--line);font:500 15px var(--mono);background:var(--surface)}
+.opts button:hover:not([disabled]){border-color:var(--blue)} .opts button:focus-visible{outline:2px solid var(--blue)}
+.opts button.right{border-color:var(--green);background:var(--green-soft)} .opts button.wrong{border-color:var(--red);background:var(--red-soft)}
+.fb{border-radius:10px;padding:12px 14px;overflow-wrap:anywhere} .fb.ok{background:var(--green-soft)} .fb.no{background:var(--red-soft)} .fb p{margin:0} .fb p+p{margin-top:6px}
+.fb b.t{display:block;font:600 15px var(--sans);margin-bottom:4px} .fb.ok b.t{color:var(--green)} .fb.no b.t{color:var(--red)}
+.qacts{display:flex;flex-wrap:wrap;gap:8px}
+.qstats{font:500 13px var(--mono);color:var(--ink2);display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center}
+.qstats b{color:var(--ink)}
+@media (max-width:900px){
+  .shell{grid-template-columns:minmax(0,1fr)}
+  nav{position:static;flex-direction:row;overflow-x:auto;gap:6px;padding-bottom:6px}
+  .grp{display:none} nav button{white-space:nowrap;border:1px solid var(--line);background:var(--surface)}
+  nav button[aria-current="true"]{border-color:var(--blue)}
+  .work{grid-template-columns:minmax(0,1fr)} .plotwrap{order:-1} .lab{padding:16px}
+}
+@media (prefers-reduced-motion:no-preference){.tile b{transition:color .2s}}
+</style>
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="topbar">
+    <a class="brand" href="index.html"><small>ΔΕΟ13</small>Ποσοτικές Μέθοδοι</a>
+    <div class="oss" role="navigation" aria-label="Ομαδικές Συμβουλευτικές Συναντήσεις">
+      <a href="index.html">Αρχική</a><a href="oss1.html" aria-current="page">ΟΣΣ1</a><a href="oss2.html">ΟΣΣ2</a><a href="oss3.html">ΟΣΣ3</a><a href="oss4.html">ΟΣΣ4</a>
+    </div>
+  </div>
+  <header>
+    <div>
+      <div class="eyebrow">ΔΕΟ13 · 1η ΟΣΣ</div>
+      <h1>Εργαστήριο Επιχειρησιακών Μαθηματικών</h1>
+      <p class="sub">Κουνήστε τα ρυθμιστικά και δείτε πώς αλλάζουν ο τύπος, οι ρίζες και το γράφημα. Στο τέλος, η καρτέλα «Κουίζ» δίνει τυχαίες ερωτήσεις για εξάσκηση.</p>
+    </div>
+    <div class="score" id="score" aria-live="polite"></div>
+  </header>
+  <div class="shell"><nav id="nav" aria-label="Ενότητες"></nav><main id="stage"></main></div>
+  <footer>Τα παραδείγματα είναι πρότυπα για μελέτη. Δεν αντιστοιχούν στις ασκήσεις της Γραπτής Εργασίας.</footer>
+</div>
+<script>
+/* ---------- helpers ---------- */
+const $=(s,r=document)=>r.querySelector(s);
+const nf=new Intl.NumberFormat('el-GR',{maximumFractionDigits:2});
+const fm=(n,d)=>{ if(!isFinite(n)) return n>0?'+∞':'−∞'; const v=Number(n.toFixed(d??2)); const s=(d==null?nf:new Intl.NumberFormat('el-GR',{maximumFractionDigits:d})).format(Object.is(v,-0)?0:v); return s.replace('-','−'); };
+const eq=(a,b)=>Math.abs(a-b)<1e-9;
+function term(c,sym,first){ if(c===0) return ''; const a=Math.abs(c); const body=sym?(a===1?sym:fm(a)+sym):fm(a); return first?((c<0?'−':'')+body):((c<0?' − ':' + ')+body); }
+function poly(cs){ let out='',first=true; for(const [c,s] of cs){ const t=term(c,s,first); if(t){out+=t;first=false;} } return out||'0'; }
+function iv(lo,loC,hi,hiC){ const L=lo===-Infinity?'(−∞':(loC?'[':'(')+fm(lo); const R=hi===Infinity?'+∞)':fm(hi)+(hiC?']':')'); return L+', '+R; }
+const sq=t=>`<span class="rad">√<span class="rb">${t}</span></span>`;
+const sqSvg=t=>`√<tspan text-decoration="overline">\u00A0${t}\u00A0</tspan>`;
+const tile=(l,v,t='')=>`<div class="tile ${t}"><span>${l}</span><b>${v}</b></div>`;
+
+/* ---------- chart engine (SVG, one scale for everything) ---------- */
+function niceStep(r){ const p=10**Math.floor(Math.log10(r)), m=r/p; return (m<1.5?1:m<3.5?2:m<7.5?5:10)*p; }
+function plot(svg,o){
+  svg._o=o;
+  const q=Math.max(1,Math.min(1.7,640/((svg.clientWidth)||640)*0.9));
+  const VW=640,VH=400,ML=46,MR=18,MT=20,MB=38,W=VW-ML-MR,H=VH-MT-MB;
+  let [x0,x1]=o.x,[y0,y1]=o.y;
+  const Z=svg._z||(svg._z={z:1,ox:0,oy:0});
+  { const mx=(x0+x1)/2+Z.ox,my=(y0+y1)/2+Z.oy,hx=(x1-x0)/2/Z.z,hy=(y1-y0)/2/Z.z; x0=mx-hx;x1=mx+hx;y0=my-hy;y1=my+hy; svg._base={mx:(o.x[0]+o.x[1])/2,my:(o.y[0]+o.y[1])/2}; }
+  const X=x=>ML+(x-x0)/(x1-x0)*W, Y=y=>MT+(y1-y)/(y1-y0)*H;
+  svg._v={x0,x1,y0,y1,ML,MT,W,H,VW,VH};
+  const cl=y=>Math.max(y0-(y1-y0),Math.min(y1+(y1-y0),y));
+  let s=`<defs><clipPath id="clip"><rect x="${ML}" y="${MT}" width="${W}" height="${H}"/></clipPath></defs>`;
+  const sx=niceStep((x1-x0)/8), sy=niceStep((y1-y0)/6);
+  for(let k=Math.ceil(x0/sx-1e-9);k*sx<=x1+1e-9;k++){const t=k*sx;s+=`<line x1="${X(t)}" y1="${MT}" x2="${X(t)}" y2="${MT+H}" stroke="var(--grid)"/><text x="${X(t)}" y="${VH-20}" font-size="${11*q}" text-anchor="middle" fill="var(--ink2)">${fm(t,3)}</text>`;}
+  for(let k=Math.ceil(y0/sy-1e-9);k*sy<=y1+1e-9;k++){const t=k*sy;s+=`<line x1="${ML}" y1="${Y(t)}" x2="${ML+W}" y2="${Y(t)}" stroke="var(--grid)"/><text x="${ML-6}" y="${Y(t)+4}" font-size="${11*q}" text-anchor="end" fill="var(--ink2)">${fm(t,3)}</text>`;}
+  if(y0<0&&y1>0) s+=`<line x1="${ML}" y1="${Y(0)}" x2="${ML+W}" y2="${Y(0)}" stroke="var(--ink2)" stroke-width="1.3"/>`;
+  if(x0<0&&x1>0) s+=`<line x1="${X(0)}" y1="${MT}" x2="${X(0)}" y2="${MT+H}" stroke="var(--ink2)" stroke-width="1.3"/>`;
+  s+=`<rect x="${ML}" y="${MT}" width="${W}" height="${H}" fill="none" stroke="var(--line)"/><g clip-path="url(#clip)">`;
+  const N=520, xs=Array.from({length:N+1},(_,i)=>x0+(x1-x0)*i/N);
+  for(const sh of (o.shades||[])){ let run=[]; const flush=()=>{ if(run.length>1){ s+=`<path d="M${X(run[0][0])},${Y(0)} `+run.map(p=>`L${X(p[0])},${Y(cl(p[1]))}`).join(' ')+` L${X(run[run.length-1][0])},${Y(0)}Z" fill="${sh.color}" opacity="${sh.op||.18}"/>`;} run=[]; };
+    for(const x of xs){ const y=sh.fn(x); if(isFinite(y)&&(sh.cond==='neg'?y<0:y>0)) run.push([x,y]); else flush(); } flush(); }
+  for(const sg of (o.segs||[])) s+=`<line x1="${X(sg.x1)}" y1="${Y(sg.y1)}" x2="${X(sg.x2)}" y2="${Y(sg.y2)}" stroke="${sg.color}" stroke-width="${sg.w||5}" stroke-linecap="round" opacity=".55"/>`;
+  for(const v of (o.vlines||[])) s+=`<line x1="${X(v.x)}" y1="${MT}" x2="${X(v.x)}" y2="${MT+H}" stroke="${v.color||'var(--ink2)'}" stroke-dasharray="6 5" stroke-width="1.5"/>`;
+  for(const h of (o.hlines||[])) s+=`<line x1="${ML}" y1="${Y(h.y)}" x2="${ML+W}" y2="${Y(h.y)}" stroke="${h.color||'var(--ink2)'}" stroke-dasharray="6 5" stroke-width="1.5"/>`;
+  for(const c of (o.curves||[])){ let d='',pen=false,py=null; for(const x of xs){ const y=c.fn(x); if(!isFinite(y)){pen=false;py=null;continue;} if(pen&&Math.abs(y-py)>(y1-y0)*2.5) pen=false; d+=(pen?'L':'M')+X(x).toFixed(1)+','+Y(cl(y)).toFixed(1)+' '; pen=true; py=y; }
+    s+=`<path d="${d}" fill="none" stroke="${c.color}" stroke-width="2.6" stroke-linejoin="round" ${c.dash?'stroke-dasharray="7 5"':''}/>`; }
+  for(const p of (o.points||[])) if(p.drop){ s+=`<line x1="${X(p.x)}" y1="${Y(p.y)}" x2="${X(p.x)}" y2="${Y(Math.max(y0,Math.min(0,y1)))}" stroke="${p.color}" stroke-dasharray="3 4"/><line x1="${X(p.x)}" y1="${Y(p.y)}" x2="${ML}" y2="${Y(p.y)}" stroke="${p.color}" stroke-dasharray="3 4"/>`; }
+  s+='</g>';
+  for(const b of (o.bands||[])){ const a=Math.max(b.x1,x0),z=Math.min(b.x2,x1); if(a>=z) continue; const yy=MT+H-5;
+    s+=`<rect x="${X(a)}" y="${yy-3}" width="${X(z)-X(a)}" height="6" rx="3" fill="${b.color}"/>`;
+    const end=(xv,closed,inf,left)=>{ if(inf){ const px=left?ML+2:ML+W-2,dx=left?8:-8; return `<path d="M${px},${yy}l${dx},-6v12z" fill="${b.color}"/>`;} return `<circle cx="${X(xv)}" cy="${yy}" r="5.5" fill="${closed?b.color:'var(--surface)'}" stroke="${b.color}" stroke-width="2"/>`; };
+    s+=end(b.x1,b.c1,b.x1<=x0,true)+end(b.x2,b.c2,b.x2>=x1,false); }
+  for(const p of (o.points||[])){ const px=X(p.x),py=Y(p.y); if(px<ML-1||px>ML+W+1||py<MT-1||py>MT+H+1) continue;
+    if(p.cross) s+=`<path d="M${px-6},${py-6}l12,12M${px+6},${py-6}l-12,12" stroke="${p.color}" stroke-width="3" stroke-linecap="round"/>`;
+    else s+=`<circle cx="${px}" cy="${py}" r="6" fill="${p.open?'var(--surface)':p.color}" stroke="${p.color}" stroke-width="2.4"/>`;
+    if(p.label){ let anc=p.anchor||'start', ddx=p.dx??9; if(!p.anchor&&px>ML+W*.7){ anc='end'; ddx=-Math.abs(ddx); } s+=`<text x="${px+ddx}" y="${py+(p.dy??-9)}" font-size="${12*q}" font-weight="500" text-anchor="${anc}" fill="${p.color}" style="paint-order:stroke;stroke:var(--surface);stroke-width:4px">${p.label}</text>`; } }
+  (o.legend||[]).forEach((l,i)=>{ s+=`<rect x="${ML+10}" y="${MT+9+i*18}" width="16" height="4" rx="2" fill="${l.color}"/><text x="${ML+32}" y="${MT+15+i*18}" font-size="${12*q}" fill="var(--ink)" style="paint-order:stroke;stroke:var(--surface);stroke-width:4px">${l.label}</text>`; });
+  s+=`<text x="${VW-MR}" y="${VH-4}" font-size="${12*q}" text-anchor="end" fill="var(--ink2)">${o.xl||'x'}</text><text x="${ML}" y="12" font-size="${12*q}" fill="var(--ink2)">${o.yl||'y'}</text>`;
+  svg.setAttribute('viewBox',`0 0 ${VW} ${VH}`); svg.setAttribute('aria-label',o.alt||'Γράφημα'); svg.innerHTML=s;
+}
+
+addEventListener('resize',()=>{ const sv=$('svg.plot'); if(sv&&sv._o) plot(sv,sv._o); });
+/* ---------- zoom / pan ---------- */
+function attachZoom(svg,wrap){
+  const redraw=()=>svg._o&&plot(svg,svg._o);
+  const clampZ=z=>Math.max(.4,Math.min(60,z));
+  function zoomAt(f,fx,fy){ const v=svg._v,Z=svg._z,b=svg._base; if(!v) return; const nz=clampZ(Z.z*f); f=nz/Z.z; if(f===1) return;
+    const dx=v.x0+fx*(v.x1-v.x0), dy=v.y1-fy*(v.y1-v.y0), hx=(v.x1-v.x0)/2/f, hy=(v.y1-v.y0)/2/f;
+    const nx0=dx-fx*2*hx, ny1=dy+fy*2*hy; Z.z=nz; Z.ox=nx0+hx-b.mx; Z.oy=ny1-hy-b.my; redraw(); }
+  const frac=e=>{ const r=svg.getBoundingClientRect(),v=svg._v; const px=(e.clientX-r.left)/r.width*v.VW, py=(e.clientY-r.top)/r.height*v.VH; return [Math.max(0,Math.min(1,(px-v.ML)/v.W)),Math.max(0,Math.min(1,(py-v.MT)/v.H))]; };
+  svg.addEventListener('wheel',e=>{ e.preventDefault(); const [fx,fy]=frac(e); zoomAt(Math.exp(-e.deltaY*.0018),fx,fy); },{passive:false});
+  const ptr=new Map(); let last=0;
+  svg.addEventListener('pointerdown',e=>{ svg.setPointerCapture(e.pointerId); ptr.set(e.pointerId,[e.clientX,e.clientY]); last=0; });
+  svg.addEventListener('pointermove',e=>{ if(!ptr.has(e.pointerId)) return; const old=ptr.get(e.pointerId); ptr.set(e.pointerId,[e.clientX,e.clientY]); const v=svg._v,Z=svg._z,r=svg.getBoundingClientRect();
+    if(ptr.size===2){ const [a,b]=[...ptr.values()]; const d=Math.hypot(a[0]-b[0],a[1]-b[1]); if(last){ const mid={clientX:(a[0]+b[0])/2,clientY:(a[1]+b[1])/2}; const [fx,fy]=frac(mid); zoomAt(d/last,fx,fy); } last=d; return; }
+    const dxp=(e.clientX-old[0])/r.width*v.VW, dyp=(e.clientY-old[1])/r.height*v.VH;
+    Z.ox-=dxp/v.W*(v.x1-v.x0); Z.oy+=dyp/v.H*(v.y1-v.y0); redraw(); });
+  const end=e=>{ ptr.delete(e.pointerId); last=0; }; svg.addEventListener('pointerup',end); svg.addEventListener('pointercancel',end);
+  const reset=()=>{ svg._z={z:1,ox:0,oy:0}; redraw(); };
+  svg.addEventListener('dblclick',reset);
+  wrap.querySelector('[data-z="in"]').onclick=()=>zoomAt(1.5,.5,.5);
+  wrap.querySelector('[data-z="out"]').onclick=()=>zoomAt(1/1.5,.5,.5);
+  wrap.querySelector('[data-z="reset"]').onclick=reset;
+}
+
+/* ---------- app shell ---------- */
+const MODS=[]; const KEY='deo13-oss1-quiz';
+let stats={ok:0,tot:0,streak:0,best:0};
+try{ Object.assign(stats,JSON.parse(localStorage.getItem(KEY)||'{}')); }catch(e){}
+const saveStats=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(stats)); }catch(e){} };
+function updateScore(){ $('#score').innerHTML=`Κουίζ: <b>${stats.ok}</b> / ${stats.tot} σωστές · σερί <b>${stats.streak}</b>`; }
+function buildNav(cur){
+  let h='',g=''; for(const m of MODS){ if(m.group!==g){ g=m.group; h+=`<div class="grp">${g}</div>`; }
+    h+=`<button data-id="${m.id}" ${m.id===cur?'aria-current="true"':''}>${m.nav}</button>`; }
+  $('#nav').innerHTML=h; $('#nav').querySelectorAll('button').forEach(b=>b.onclick=()=>open(b.dataset.id));
+}
+function open(id){
+  const m=MODS.find(x=>x.id===id)||MODS[0]; try{ history.replaceState(null,'','#'+m.id); }catch(e){}
+  buildNav(m.id); if(m.mount){ m.mount($('#stage')); window.scrollTo({top:0}); return; }
+  const st=m.state;
+  const ctl=m.controls.map(c=>c.type==='choice'
+    ? `<div class="ctl"><label>${c.label}</label><div class="seg" data-k="${c.k}">${c.options.map(([v,t])=>`<button type="button" data-v="${v}" aria-pressed="${st[c.k]===v}">${t}</button>`).join('')}</div></div>`
+    : `<div class="ctl"><label for="c-${c.k}">${c.label}<output id="o-${c.k}"></output></label><input id="c-${c.k}" type="range" min="${c.min}" max="${c.max}" step="${c.step}" value="${st[c.k]}"></div>`).join('');
+  const pre=(m.presets||[]).map((p,i)=>`<button type="button" class="btn" data-p="${i}">${p.label}</button>`).join('');
+  $('#stage').innerHTML=`<section class="lab"><div><h2>${m.title}</h2><p class="lead">${m.lead}</p></div>
+   <div class="howto"><b>Οδηγίες</b><ol class="steps">${(m.guide||[]).map(t=>`<li>${t}</li>`).join('')}</ol></div>
+   <div class="work"><div class="panel"><h3>Παράμετροι</h3>${ctl}${pre?`<h3>Έτοιμα σενάρια</h3><div class="seg">${pre}</div>`:''}</div>
+   <div class="plotwrap"><div class="zoombar"><button type="button" data-z="in" aria-label="Μεγέθυνση">+</button><button type="button" data-z="out" aria-label="Σμίκρυνση">−</button><button type="button" data-z="reset" aria-label="Επαναφορά προβολής">⟲</button></div><svg class="plot" role="img"></svg>
+   <p class="hint">Ροδέλα ή κουμπιά + / −: ζουμ. Σύρσιμο: μετακίνηση. Διπλό κλικ ή ⟲: επαναφορά.</p></div></div>
+   <div class="read" id="read"></div><div class="explain" id="explain"></div></section>`;
+  const svg=$('svg.plot'); attachZoom(svg,$('.plotwrap'));
+  const upd=()=>{ for(const c of m.controls){ if(c.type==='choice') continue; const o=$('#o-'+c.k); if(o) o.textContent=(c.fmt?c.fmt(st[c.k]):fm(st[c.k])); }
+    const r=m.render(st); plot(svg,r.plot); $('#read').innerHTML=r.tiles.join(''); $('#explain').innerHTML='<h3 class="eh">Ερμηνεία για τις τρέχουσες τιμές</h3>'+r.html; };
+  const sync=()=>{ for(const c of m.controls){ if(c.type==='choice') $('#stage').querySelectorAll(`.seg[data-k="${c.k}"] button`).forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===st[c.k])); else $('#c-'+c.k).value=st[c.k]; } upd(); };
+  m.controls.forEach(c=>{ if(c.type==='choice'){ $('#stage').querySelectorAll(`.seg[data-k="${c.k}"] button`).forEach(b=>b.onclick=()=>{ st[c.k]=b.dataset.v; sync(); }); }
+    else $('#c-'+c.k).oninput=e=>{ let v=parseFloat(e.target.value); if(c.noZero&&v===0){ v=c.step; e.target.value=v; } st[c.k]=v; upd(); }; });
+  $('#stage').querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{ Object.assign(st,m.presets[+b.dataset.p].set); sync(); });
+  upd();
+}
+</script>
+<script>
+const pn=v=>v<0?`(${fm(v)})`:fm(v);
+const fac=r=>r===0?'x':(r>0?`(x − ${fm(r)})`:`(x + ${fm(-r)})`);
+
+/* 1. Πεδίο ορισμού */
+MODS.push({id:'domain',group:'Συναρτήσεις',nav:'Πεδίο ορισμού',title:'Πεδίο ορισμού',
+ lead:'Πριν υπολογίσουμε οτιδήποτε ρωτάμε: για ποιες τιμές του x έχει νόημα η συνάρτηση; Ο παρονομαστής δεν μηδενίζεται, το υπόριζο δεν είναι αρνητικό και το όρισμα του λογαρίθμου είναι θετικό.',
+ state:{type:'sqrt',k:1,c:2,x0:3},
+ controls:[{type:'choice',k:'type',label:'Τύπος συνάρτησης',options:[['rational','1/(kx − c)'],['sqrt',sq('kx − c')],['ln','ln(kx − c)']]},
+  {k:'k',label:'Συντελεστής k (k ≠ 0)',min:-3,max:3,step:.5,noZero:true},{k:'c',label:'Σταθερά c',min:-6,max:6,step:.5},{k:'x0',label:'Σημείο ελέγχου x₀',min:-8,max:8,step:.5}],
+ render(s){ const {type,k,c,x0}=s, xb=c/k, inn=x=>k*x-c, ex=poly([[k,'x'],[-c,'']]);
+  const fn=type==='rational'?x=>1/inn(x):type==='sqrt'?x=>Math.sqrt(inn(x)):x=>Math.log(inn(x));
+  const rule=type==='rational'?`${ex} ≠ 0`:type==='sqrt'?`${ex} ≥ 0`:`${ex} > 0`;
+  const closed=type==='sqrt'; let dom,bands=[];
+  if(type==='rational'){ dom=`(−∞, ${fm(xb)}) ∪ (${fm(xb)}, +∞)`; bands=[{x1:-1e9,x2:xb,c1:false,c2:false,color:'var(--green)'},{x1:xb,x2:1e9,c1:false,c2:false,color:'var(--green)'}]; }
+  else if(k>0){ dom=iv(xb,closed,Infinity); bands=[{x1:xb,x2:1e9,c1:closed,c2:false,color:'var(--green)'}]; }
+  else { dom=iv(-Infinity,false,xb,closed); bands=[{x1:-1e9,x2:xb,c1:false,c2:closed,color:'var(--green)'}]; }
+  const v=inn(x0), ok=type==='rational'?v!==0:type==='sqrt'?v>=0:v>0, fx=ok?fn(x0):NaN;
+  const pts=[]; if(closed) pts.push({x:xb,y:0,color:'var(--green)',label:`x = ${fm(xb)}`,dy:16});
+  pts.push(ok?{x:x0,y:fx,color:'var(--blue)',label:`f(x₀) = ${fm(fx)}`}:{x:x0,y:0,color:'var(--red)',cross:true});
+  return {plot:{x:[-8,8],y:[-6,6],curves:[{fn,color:'var(--blue)'}],vlines:closed?[]:[{x:xb,color:'var(--red)'}],points:pts,bands,legend:[{label:`f(x) = ${type==='rational'?'1/('+ex+')':type==='sqrt'?sqSvg(ex):'ln('+ex+')'}`,color:'var(--blue)'}],alt:'Γράφημα συνάρτησης και πεδίο ορισμού'},
+   tiles:[tile('Περιορισμός',rule),tile('Όριο',`x = ${fm(xb)}`),tile('Πεδίο ορισμού',dom,'good'),tile(`Στο x₀ = ${fm(x0)}`,ok?'ορίζεται':'δεν ορίζεται',ok?'good':'bad')],
+   html:`<p>Η έκφραση <code>${ex}</code> παίρνει στο x₀ την τιμή <code>${fm(v)}</code>. ${ok?`Ο περιορισμός ικανοποιείται, άρα f(x₀) = ${fm(fx)}.`:`Ο περιορισμός <code>${rule}</code> δεν ικανοποιείται, άρα η f δεν ορίζεται εκεί (κόκκινο ×).`}</p><p>Η πράσινη γραμμή στον άξονα x δείχνει το πεδίο ορισμού. Κύκλος γεμάτος σημαίνει ότι το άκρο ανήκει, κενός ότι δεν ανήκει.${k<0?' Με αρνητικό k το πεδίο αντιστρέφεται, επειδή διαιρούμε με αρνητικό αριθμό.':''}</p>`}; }});
+
+/* 2. Γραμμική */
+MODS.push({id:'linear',group:'Συναρτήσεις',nav:'Γραμμική συνάρτηση',title:'Γραμμική συνάρτηση f(x) = ax + b',
+ lead:'Η κλίση a λέει πόσο αλλάζει το y όταν το x αυξηθεί κατά 1. Το b είναι η τιμή στο x = 0. Η ρίζα είναι εκεί όπου η ευθεία τέμνει τον άξονα x.',
+ state:{a:2,b:1,x0:1.5},controls:[{k:'a',label:'Κλίση a',min:-4,max:4,step:.5},{k:'b',label:'Σταθερός όρος b',min:-6,max:6,step:.5},{k:'x0',label:'Σημείο x₀',min:-5,max:5,step:.5}],
+ presets:[{label:'Αύξουσα',set:{a:2,b:1}},{label:'Φθίνουσα',set:{a:-1.5,b:3}},{label:'Σταθερή',set:{a:0,b:2}}],
+ render(s){ const {a,b,x0}=s, f=x=>a*x+b, xr=-b/a, form=poly([[a,'x'],[b,'']]); let band=[];
+  if(a>0) band=[{x1:xr,x2:1e9,c1:false,c2:false,color:'var(--green)'}]; else if(a<0) band=[{x1:-1e9,x2:xr,c1:false,c2:false,color:'var(--green)'}]; else if(b>0) band=[{x1:-1e9,x2:1e9,c1:false,c2:false,color:'var(--green)'}];
+  const sol=a>0?iv(xr,false,Infinity):a<0?iv(-Infinity,false,xr):(b>0?'όλοι οι πραγματικοί':'κανένα x');
+  const pts=[{x:0,y:b,color:'var(--blue)',label:`(0, ${fm(b)})`}]; if(a!==0) pts.push({x:xr,y:0,color:'var(--green)',label:`x = ${fm(xr)}`,dy:18}); pts.push({x:x0,y:f(x0),color:'var(--red)',label:`f(${fm(x0)}) = ${fm(f(x0))}`});
+  return {plot:{x:[-6,6],y:[-8,8],curves:[{fn:f,color:'var(--blue)'}],points:pts,bands:band,legend:[{label:`f(x) = ${form}`,color:'var(--blue)'}],alt:'Γράφημα ευθείας'},
+   tiles:[tile('Κλίση a',fm(a),a>0?'good':a<0?'bad':''),tile('f(0) = b',fm(b)),tile('Ρίζα',a===0?'δεν υπάρχει':fm(xr),a===0?'warn':''),tile(`f(${fm(x0)})`,fm(f(x0)))],
+   html:`<p>Ισχύει <code>f(x) &gt; 0 ⇔ ${form} &gt; 0</code>, δηλαδή <code>x ∈ ${sol}</code>.</p><p>${a>0?'Με a > 0 η ευθεία ανεβαίνει και είναι θετική δεξιά από τη ρίζα.':a<0?'Με a < 0 η ευθεία κατεβαίνει. Όταν διαιρούμε με αρνητικό αριθμό η φορά της ανίσωσης αλλάζει, γι’ αυτό η λύση είναι στα αριστερά της ρίζας.':'Με a = 0 η συνάρτηση είναι σταθερή: δεν έχει ρίζα και έχει παντού το πρόσημο του b.'}</p>`}; }});
+
+/* 3. Δευτεροβάθμια */
+MODS.push({id:'quad',group:'Συναρτήσεις',nav:'Δευτεροβάθμια',title:'Δευτεροβάθμια συνάρτηση f(x) = ax² + bx + c',
+ lead:'Η διακρίνουσα Δ = b² − 4ac αποφασίζει πόσες ρίζες έχει η παραβολή. Οι ρίζες χωρίζουν τον άξονα σε διαστήματα και κάθε διάστημα έχει σταθερό πρόσημο.',
+ state:{a:1,b:-5,c:6},controls:[{k:'a',label:'a (a ≠ 0)',min:-3,max:3,step:.5,noZero:true},{k:'b',label:'b',min:-8,max:8,step:1},{k:'c',label:'c',min:-8,max:8,step:1}],
+ presets:[{label:'Δ > 0',set:{a:1,b:-5,c:6}},{label:'Δ = 0',set:{a:1,b:-4,c:4}},{label:'Δ < 0',set:{a:1,b:0,c:1}},{label:'a < 0',set:{a:-1,b:5,c:-6}}],
+ render(s){ const {a,b,c}=s, D=b*b-4*a*c, f=x=>a*x*x+b*x+c, xv=-b/(2*a), yv=f(xv), form=poly([[a,'x²'],[b,'x'],[c,'']]);
+  const r=D>=0?[(-b-Math.sqrt(D))/(2*a),(-b+Math.sqrt(D))/(2*a)].sort((p,q)=>p-q):[];
+  const pts=[{x:xv,y:yv,color:'var(--amber)',label:`κορυφή (${fm(xv)}, ${fm(yv)})`,dy:a>0?18:-10},{x:0,y:c,color:'var(--blue)',label:`(0, ${fm(c)})`,dx:-9,anchor:'end'}];
+  r.forEach((x,i)=>{ if(i===0||D>0) pts.push({x,y:0,color:'var(--green)',label:`x = ${fm(x)}`,dy:a>0?-12:18,dx:D>0?(i===0?-9:9):9,anchor:D>0&&i===0?'end':'start'}); });
+  let sign,fz=''; if(D>0){ const [p,q]=r; const outer=`(−∞, ${fm(p)}) ∪ (${fm(q)}, +∞)`,inner=iv(p,false,q,false); sign=a>0?`f > 0 στο ${outer}, f < 0 στο (${inner})`:`f > 0 στο (${inner}), f < 0 στο ${outer}`; fz=`<p>Παραγοντοποίηση: <code>f(x) = ${a===1?'':fm(a)}${fac(p)}${fac(q)}</code></p>`; }
+  else if(D===0){ sign=`f ${a>0?'≥':'≤'} 0 παντού, με f = 0 μόνο στο x = ${fm(r[0])}`; fz=`<p>Διπλή ρίζα: <code>f(x) = ${a===1?'':fm(a)}${fac(r[0])}²</code></p>`; }
+  else sign=a>0?'f > 0 για κάθε x (η παραβολή είναι πάνω από τον άξονα)':'f < 0 για κάθε x (η παραβολή είναι κάτω από τον άξονα)';
+  const bands=D>0?[{x1:-1e9,x2:r[0],c1:false,c2:false,color:a>0?'var(--blue)':'var(--red)'},{x1:r[0],x2:r[1],c1:false,c2:false,color:a>0?'var(--red)':'var(--blue)'},{x1:r[1],x2:1e9,c1:false,c2:false,color:a>0?'var(--blue)':'var(--red)'}]:[{x1:-1e9,x2:1e9,c1:false,c2:false,color:a>0?'var(--blue)':'var(--red)'}];
+  return {plot:{x:[-10,10],y:[-15,15],curves:[{fn:f,color:'var(--blue)'}],points:pts,bands,legend:[{label:`f(x) = ${form}`,color:'var(--blue)'}],alt:'Γράφημα παραβολής'},
+   tiles:[tile('Διακρίνουσα Δ',fm(D),D>0?'good':D===0?'warn':'bad'),tile('Ρίζες',D>0?`${fm(r[0])} και ${fm(r[1])}`:D===0?`${fm(r[0])} (διπλή)`:'καμία πραγματική',D<0?'bad':''),tile('Κορυφή',`(${fm(xv)}, ${fm(yv)})`),tile(a>0?'Ελάχιστο':'Μέγιστο',fm(yv))],
+   html:`<p>Δ = b² − 4ac = ${pn(b)}² − 4·${pn(a)}·${pn(c)} = <code>${fm(D)}</code>. ${D>0?'Δύο διαφορετικές ρίζες.':D===0?'Μία διπλή ρίζα: η παραβολή εφάπτεται του άξονα x.':'Καμία πραγματική ρίζα: η παραβολή δεν τέμνει τον άξονα x.'}</p><p>Πρόσημο: ${sign}. Η μπλε γραμμή στον άξονα x δείχνει πού η f είναι θετική και η κόκκινη πού είναι αρνητική.</p>${fz}`}; }});
+
+/* 4. Γραμμικό σύστημα */
+MODS.push({id:'system',group:'Συστήματα και λογάριθμοι',nav:'Γραμμικό σύστημα',title:'Γραμμικό σύστημα δύο ευθειών',
+ lead:'Η λύση του συστήματος είναι το κοινό σημείο των δύο ευθειών. Οι κλίσεις λένε αν οι ευθείες τέμνονται, είναι παράλληλες (a₁ = a₂) ή κάθετες (a₁·a₂ = −1).',
+ state:{a1:2,b1:1,a2:-1,b2:4},controls:[{k:'a1',label:'Ευθεία 1: κλίση a₁',min:-4,max:4,step:.5},{k:'b1',label:'Ευθεία 1: b₁',min:-6,max:6,step:.5},{k:'a2',label:'Ευθεία 2: κλίση a₂',min:-4,max:4,step:.5},{k:'b2',label:'Ευθεία 2: b₂',min:-6,max:6,step:.5}],
+ presets:[{label:'Μία λύση',set:{a1:2,b1:1,a2:-1,b2:4}},{label:'Καμία λύση',set:{a1:2,b1:1,a2:2,b2:-2}},{label:'Άπειρες λύσεις',set:{a1:-1,b1:2,a2:-1,b2:2}}],
+ render(s){ const {a1,b1,a2,b2}=s, f1=x=>a1*x+b1, f2=x=>a2*x+b2, e1=poly([[a1,'x'],[b1,'']]), e2=poly([[a2,'x'],[b2,'']]);
+  const par=eq(a1,a2), same=par&&eq(b1,b2), perp=eq(a1*a2,-1); let tl,chip,pts=[],steps='';
+  if(!par){ const x=(b2-b1)/(a1-a2), y=f1(x); pts=[{x,y,color:'var(--green)',label:`(${fm(x)}, ${fm(y)})`}]; tl='μία λύση'; chip=`<span class="chip good">Μία λύση</span>`;
+    steps=`<ol class="steps"><li>Εξισώνουμε: ${e1} = ${e2}</li><li>(${fm(a1)} − ${pn(a2)})x = ${fm(b2)} − ${pn(b1)}, άρα x = ${fm(x)}</li><li>y = ${fm(a1)}·${pn(x)} + ${pn(b1)} = ${fm(y)}</li></ol>`; }
+  else if(same){ tl='άπειρες λύσεις'; chip=`<span class="chip warn">Άπειρες λύσεις</span>`; steps='<p>Οι εξισώσεις είναι ισοδύναμες: είναι η ίδια ευθεία, άρα κάθε σημείο της είναι λύση.</p>'; }
+  else { tl='καμία λύση'; chip=`<span class="chip bad">Καμία λύση</span>`; steps=`<p>Η εξίσωση γίνεται 0·x = ${fm(b2-b1)}, που είναι αδύνατη. Ίδια κλίση, διαφορετικό b: παράλληλες ευθείες.</p>`; }
+  return {plot:{x:[-8,8],y:[-10,10],curves:[{fn:f1,color:'var(--blue)'},{fn:f2,color:'var(--red)',dash:same}],points:pts,legend:[{label:`y = ${e1}`,color:'var(--blue)'},{label:`y = ${e2}`,color:'var(--red)'}],alt:'Δύο ευθείες'},
+   tiles:[tile('Λύσεις',tl,par?(same?'warn':'bad'):'good'),tile('a₁ · a₂',fm(a1*a2),perp?'good':''),tile('Σχέση',par?'παράλληλες':perp?'κάθετες':'τεμνόμενες')],
+   html:`<p>${chip}</p>${steps}`}; }});
+</script>
+<script>
+/* 5. Ιδιότητες λογαρίθμων */
+MODS.push({id:'logprops',group:'Συστήματα και λογάριθμοι',nav:'Ιδιότητες λογαρίθμων',title:'Ιδιότητες των λογαρίθμων',
+ lead:'Ο λογάριθμος μετατρέπει γινόμενα σε αθροίσματα. Στο γράφημα το ύψος του ln(ab) είναι ακριβώς το άθροισμα των υψών ln a και ln b.',
+ state:{a:2,b:3,k:2},controls:[{k:'a',label:'a (θετικός)',min:.5,max:8,step:.5},{k:'b',label:'b (θετικός)',min:.5,max:8,step:.5},{k:'k',label:'Εκθέτης k',min:1,max:4,step:1}],
+ render(s){ const {a,b,k}=s, L=Math.log, ab=a*b, xmax=Math.max(10,ab*1.15);
+  const row=(l,r,lv,rv)=>tile(`${l} = ${r}`,`${fm(lv,4)} = ${fm(rv,4)} ✓`,'good');
+  return {plot:{x:[0,xmax],y:[-2,Math.max(3,L(ab)+1)],curves:[{fn:L,color:'var(--blue)'}],points:[{x:a,y:L(a),color:'var(--blue)',drop:true,label:'ln a'},{x:b,y:L(b),color:'var(--red)',drop:true,label:'ln b',dy:16},{x:ab,y:L(ab),color:'var(--green)',drop:true,label:'ln(ab)',dx:-9,anchor:'end',dy:18}],legend:[{label:'y = ln x',color:'var(--blue)'}],alt:'Γράφημα του φυσικού λογαρίθμου'},
+   tiles:[row('ln(ab)','ln a + ln b',L(ab),L(a)+L(b)),row('ln(a/b)','ln a − ln b',L(a/b),L(a)-L(b)),row(`ln(a<sup>${k}</sup>)`,`${k}·ln a`,L(a**k),k*L(a))],
+   html:`<p>Με a = ${fm(a)} και b = ${fm(b)}: <code>ab = ${fm(ab)}</code>, και ln(${fm(ab)}) = ${fm(L(ab),4)} = ${fm(L(a),4)} + ${fm(L(b),4)}.</p><p>Αυτές οι ιδιότητες ισχύουν μόνο για θετικά a και b. Γι’ αυτό σε κάθε λογαριθμική εξίσωση βρίσκουμε πρώτα το πεδίο ορισμού.</p>`}; }});
+
+/* 6. Λογαριθμική εξίσωση */
+MODS.push({id:'logeq',group:'Συστήματα και λογάριθμοι',nav:'Λογαριθμική εξίσωση',title:'Λογαριθμική εξίσωση ln(x − p) + ln(x + q) = ln c',
+ lead:'Βήματα: περιορισμοί, ιδιότητες των λογαρίθμων, δευτεροβάθμια εξίσωση, έλεγχος των ριζών. Μια ρίζα εκτός πεδίου ορισμού απορρίπτεται.',
+ state:{p:1,q:2,c:12},controls:[{k:'p',label:'p',min:-3,max:5,step:1},{k:'q',label:'q',min:-3,max:5,step:1},{k:'c',label:'c (θετικός)',min:1,max:30,step:1}],
+ render(s){ const {p,q,c}=s, L=Math.max(p,-q), g=x=>Math.log(x-p)+Math.log(x+q), B=q-p, C=-p*q-c, D=B*B-4*C, rs=[(-B-Math.sqrt(D))/2,(-B+Math.sqrt(D))/2];
+  const acc=rs.filter(x=>x>L), rej=rs.filter(x=>x<=L), lc=Math.log(c);
+  const pts=[...acc.map(x=>({x,y:lc,color:'var(--green)',label:`x = ${fm(x)}`,dy:-12})),...rej.map(x=>({x,y:lc,color:'var(--red)',cross:true,label:`x = ${fm(x)}`,dy:-12}))];
+  const quad=poly([[1,'x²'],[B,'x'],[C,'']]);
+  return {plot:{x:[-8,12],y:[-4,6],curves:[{fn:g,color:'var(--blue)'}],hlines:[{y:lc,color:'var(--red)'}],vlines:[{x:L,color:'var(--amber)'}],points:pts,
+    legend:[{label:'y = ln(x − p) + ln(x + q)',color:'var(--blue)'},{label:`y = ln ${fm(c)}`,color:'var(--red)'}],alt:'Γράφημα λογαριθμικής εξίσωσης'},
+   tiles:[tile('Πεδίο ορισμού',`x > ${fm(L)}`),tile('Εξίσωση 2ου βαθμού',quad+' = 0'),tile('Ρίζες',rs.map(r=>fm(r)).join(' και ')),tile('Δεκτές',acc.length?acc.map(r=>fm(r)).join(', '):'καμία',acc.length?'good':'bad')],
+   html:`<ol class="steps"><li>Περιορισμοί: x − ${pn(p)} &gt; 0 και x + ${pn(q)} &gt; 0, άρα <code>x &gt; ${fm(L)}</code>.</li><li>ln[(x − ${pn(p)})(x + ${pn(q)})] = ln ${fm(c)}, άρα (x − ${pn(p)})(x + ${pn(q)}) = ${fm(c)}.</li><li>Δευτεροβάθμια: <code>${quad} = 0</code>, με Δ = ${fm(D)}.</li><li>Έλεγχος: ${rs.map(r=>`${fm(r)} ${r>L?'ικανοποιεί':'δεν ικανοποιεί'} x &gt; ${fm(L)} ${r>L?'(δεκτή)':'(απορρίπτεται)'}`).join('· ')}.</li></ol>`}; }});
+
+/* 7. Προσφορά και ζήτηση */
+MODS.push({id:'market',group:'Εφαρμογές',nav:'Προσφορά και ζήτηση',title:'Προσφορά, ζήτηση και ισορροπία',
+ lead:'Η ζήτηση Q_D = A − bP φθίνει με την τιμή και η προσφορά Q_S = c + dP αυξάνει. Η ισορροπία είναι το σημείο τομής τους. Για άλλη τιμή εμφανίζεται έλλειμμα ή πλεόνασμα.',
+ state:{A:100,b:2,c:20,d:3,P0:10},controls:[{k:'A',label:'Ζήτηση: A',min:60,max:140,step:10},{k:'b',label:'Ζήτηση: b',min:1,max:4,step:.5},{k:'c',label:'Προσφορά: c',min:0,max:40,step:5},{k:'d',label:'Προσφορά: d',min:1,max:5,step:.5},{k:'P0',label:'Δοκιμαστική τιμή P₀',min:0,max:50,step:1}],
+ render(s){ const {A,b,c,d,P0}=s, Qd=P=>A-b*P, Qs=P=>c+d*P, Ps=(A-c)/(b+d), Qe=Qd(Ps), dd=Qd(P0), ss=Qs(P0), gap=dd-ss;
+  const st=Math.abs(gap)<1e-9?['Ισορροπία','warn']:gap>0?['Έλλειμμα','bad']:['Πλεόνασμα','good'], col=gap>0?'var(--red)':'var(--blue)';
+  return {plot:{x:[0,50],y:[0,150],xl:'P (τιμή)',yl:'Q (ποσότητα)',curves:[{fn:Qd,color:'var(--blue)'},{fn:Qs,color:'var(--red)'}],vlines:[{x:P0}],segs:[{x1:P0,y1:dd,x2:P0,y2:ss,color:col,w:7}],
+    points:[{x:Ps,y:Qe,color:'var(--green)',label:`(${fm(Ps)}, ${fm(Qe)})`,dx:10,dy:-10},{x:P0,y:dd,color:'var(--blue)'},{x:P0,y:ss,color:'var(--red)'}],legend:[{label:`Q_D = ${fm(A)} − ${fm(b)}P`,color:'var(--blue)'},{label:`Q_S = ${fm(c)} + ${fm(d)}P`,color:'var(--red)'}],alt:'Προσφορά και ζήτηση'},
+   tiles:[tile('Τιμή ισορροπίας P*',fm(Ps)),tile('Ποσότητα Q*',fm(Qe)),tile(`Στο P₀ = ${fm(P0)}`,`Q_D = ${fm(dd)}, Q_S = ${fm(ss)}`),tile('Κατάσταση',`${st[0]}${Math.abs(gap)<1e-9?'':' '+fm(Math.abs(gap))}`,st[1])],
+   html:`<p>Ισορροπία: ${fm(A)} − ${fm(b)}P = ${fm(c)} + ${fm(d)}P ⇒ ${fm(A-c)} = ${fm(b+d)}P ⇒ <code>P* = ${fm(Ps)}</code>, Q* = ${fm(Qe)}.</p><p>${gap>1e-9?`Στην τιμή ${fm(P0)} (κάτω από την ισορροπία) οι καταναλωτές ζητούν περισσότερα από όσα προσφέρονται: έλλειμμα ${fm(gap)} μονάδων.`:gap<-1e-9?`Στην τιμή ${fm(P0)} (πάνω από την ισορροπία) προσφέρονται περισσότερα από όσα ζητούνται: πλεόνασμα ${fm(-gap)} μονάδων.`:'Η δοκιμαστική τιμή ισούται με την τιμή ισορροπίας.'}</p>`}; }});
+
+/* 8. Κέρδος */
+MODS.push({id:'profit',group:'Εφαρμογές',nav:'Έσοδα, κόστος, κέρδος',title:'Έσοδα, κόστος και κέρδος',
+ lead:'Με αντίστροφη ζήτηση P = A − bQ τα έσοδα είναι TR = (A − bQ)·Q και το κόστος TC = vQ + F. Το κέρδος Π = TR − TC είναι δευτεροβάθμιο. Οι ρίζες του είναι τα νεκρά σημεία.',
+ state:{A:40,b:1,v:10,F:56,view:'profit'},controls:[{type:'choice',k:'view',label:'Προβολή',options:[['profit','Κέρδος Π(Q)'],['rc','Έσοδα και κόστος']]},{k:'A',label:'Μέγιστη τιμή A',min:20,max:80,step:5},{k:'b',label:'Κλίση b',min:.5,max:3,step:.5},{k:'v',label:'Μεταβλητό κόστος v',min:0,max:30,step:1},{k:'F',label:'Σταθερό κόστος F',min:0,max:300,step:2}],
+ render(s){ const {A,b,v,F,view}=s, TR=Q=>A*Q-b*Q*Q, TC=Q=>v*Q+F, Pi=Q=>TR(Q)-TC(Q), Qm=A/b, B=A-v, D=B*B-4*b*F, Qs=B/(2*b), Qo=Math.max(0,Qs), Po=Pi(Qo);
+  const r=D>=0?[(B-Math.sqrt(D))/(2*b),(B+Math.sqrt(D))/(2*b)]:[], inR=r.filter(x=>x>=0&&x<=Qm);
+  let pl; const form=poly([[-b,'Q²'],[B,'Q'],[-F,'']]);
+  if(view==='profit'){ const lo=Math.min(Pi(Qm),-F)*1.1-2, hi=Math.max(Po*1.25,10);
+    pl={x:[0,Qm],y:[lo,hi],xl:'Q',yl:'Π (κέρδος)',curves:[{fn:Pi,color:'var(--blue)'}],shades:[{fn:Pi,cond:'pos',color:'var(--green)',op:.25},{fn:Pi,cond:'neg',color:'var(--red)',op:.18}],points:[...inR.map(x=>({x,y:0,color:'var(--green)',label:`Q = ${fm(x)}`,dy:-12})),...(Qs>0?[{x:Qo,y:Po,color:'var(--amber)',label:`μέγιστο (${fm(Qo)}, ${fm(Po)})`,dy:-12,anchor:Qo>Qm*.6?'end':'start',dx:Qo>Qm*.6?-9:9}]:[])],legend:[{label:`Π(Q) = ${form}`,color:'var(--blue)'}]}; }
+  else { const hi=Math.max(A*A/(4*b),TC(Qm))*1.1; pl={x:[0,Qm],y:[0,hi],xl:'Q',yl:'€',curves:[{fn:TR,color:'var(--blue)'},{fn:TC,color:'var(--red)'}],points:inR.map(x=>({x,y:TR(x),color:'var(--green)',label:`Q = ${fm(x)}`,dy:-12})),legend:[{label:'TR(Q) έσοδα',color:'var(--blue)'},{label:'TC(Q) κόστος',color:'var(--red)'}]}; }
+  pl.alt='Έσοδα, κόστος και κέρδος';
+  const be=D<0?'κανένα':D===0?fm(r[0]):`${fm(r[0])} και ${fm(r[1])}`;
+  return {plot:pl,tiles:[tile('Κέρδος Π(Q)',form),tile('Διακρίνουσα Δ',fm(D),D>0?'good':D===0?'warn':'bad'),tile('Νεκρά σημεία',be,D<0?'bad':''),tile('Μέγιστο κέρδος',`${fm(Po)} στο Q = ${fm(Qo)}`,Po>0?'good':'bad')],
+   html:`<p>TR = ${fm(A)}Q − ${fm(b)}Q², TC = ${fm(v)}Q + ${fm(F)}, άρα <code>Π(Q) = ${form}</code>.</p><p>${D<0?'Δ < 0: η Π δεν μηδενίζεται και έχει παντού το πρόσημο του −b, δηλαδή αρνητικό. Η επιχείρηση έχει πάντα ζημία.':D===0?'Δ = 0: το κέρδος μηδενίζεται σε ένα μόνο σημείο και αλλού είναι αρνητικό.':`Κέρδος για Q μεταξύ των ριζών ${fm(r[0])} και ${fm(r[1])}, ζημία έξω από αυτές. Το μέγιστο είναι στην κορυφή Q = (A − v)/(2b) = ${fm(Qs)}, με τιμή πώλησης P = ${fm(A-b*Qo)}.`}</p>`}; }});
+
+</script>
+<script>
+/* ---------- οδηγίες ανά ενότητα ---------- */
+const GUIDES={
+ domain:['Διάλεξε τύπο συνάρτησης και μετακίνησε το c: το όριο του πεδίου ορισμού κινείται μαζί του.','Βάλε αρνητικό k (π.χ. −1). Το πεδίο ορισμού αντιστρέφεται, επειδή διαιρούμε με αρνητικό αριθμό.','Μετακίνησε το x₀ μέσα και έξω από την πράσινη περιοχή του άξονα x. Όταν η f δεν ορίζεται εμφανίζεται κόκκινο ×.'],
+ linear:['Μετακίνησε το a από θετικό σε αρνητικό και δες την ευθεία να ανεβαίνει ή να κατεβαίνει.','Βάλε a = 0: η συνάρτηση γίνεται σταθερή και δεν έχει ρίζα.','Μετακίνησε το x₀ και σύγκρινε το f(x₀) στο πλακίδιο με το σημείο στο γράφημα.'],
+ quad:['Πάτα τα έτοιμα σενάρια Δ > 0, Δ = 0, Δ < 0 και μέτρα πόσες φορές η παραβολή τέμνει τον άξονα x.','Βάλε αρνητικό a: η παραβολή ανοίγει προς τα κάτω και τα πρόσημα αντιστρέφονται.','Άλλαξε το c: η τομή με τον άξονα y είναι πάντα στο (0, c).'],
+ system:['Πάτα τα τρία έτοιμα σενάρια και δες πότε οι ευθείες τέμνονται, δεν συναντιούνται ή ταυτίζονται.','Ξεκίνα από τέμνουσες ευθείες και κάνε τις κλίσεις ίσες: οι ευθείες γίνονται παράλληλες.','Δοκίμασε a₁ = 2 και a₂ = −0,5: το γινόμενο των κλίσεων είναι −1 και οι ευθείες είναι κάθετες.'],
+ logprops:['Άλλαξε τα a και b και δες ότι το ύψος του ln(ab) είναι πάντα ίσο με ln a + ln b.','Πάρε a = b και δες ότι το ln(a/b) γίνεται 0.','Άλλαξε το k και σύγκρινε το ln(aᵏ) με το k·ln a.'],
+ logeq:['Άλλαξε το c και δες το κόκκινο οριζόντιο ευθύγραμμο τμήμα y = ln c να μετακινείται. Η λύση είναι εκεί που το τέμνει η μπλε καμπύλη.','Κοίτα τη διακεκομμένη κάθετη γραμμή: το πεδίο ορισμού είναι δεξιά της. Μια ρίζα στα αριστερά της απορρίπτεται (κόκκινο ×).','Άλλαξε τα p και q και παρακολούθησε πώς αλλάζουν το πεδίο ορισμού και η δευτεροβάθμια εξίσωση.'],
+ market:['Μετακίνησε την τιμή P₀ κάτω από την ισορροπία: εμφανίζεται έλλειμμα. Πάνω από αυτήν: πλεόνασμα.','Αύξησε το A (ζήτηση): η ευθεία ζήτησης μετακινείται και η τιμή ισορροπίας ανεβαίνει.','Αύξησε το c (προσφορά): η προσφορά αυξάνεται και η τιμή ισορροπίας πέφτει.'],
+ profit:['Στην προβολή «Κέρδος», δες το πράσινο τμήμα (κέρδος) ανάμεσα στα νεκρά σημεία και το κόκκινο (ζημία) έξω από αυτά.','Αύξησε το σταθερό κόστος F: η καμπύλη κατεβαίνει και τα νεκρά σημεία πλησιάζουν. Αν Δ < 0 εξαφανίζονται.','Πέρασε στην προβολή «Έσοδα και κόστος»: τα νεκρά σημεία είναι εκεί όπου τέμνονται οι δύο καμπύλες.']
+};
+MODS.forEach(m=>{ if(GUIDES[m.id]) m.guide=GUIDES[m.id]; });
+
+/* ---------- κουίζ ---------- */
+const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1)), pick=a=>a[ri(0,a.length-1)];
+const nz=(a,b)=>{ let v=0; while(v===0) v=ri(a,b); return v; };
+const shuffle=a=>{ a=[...a]; for(let i=a.length-1;i>0;i--){ const j=ri(0,i); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const C=t=>`<code>${t}</code>`;
+const fx=(cs)=>poly(cs);
+const TAGS=['Ευθείες και συστήματα','Δευτεροβάθμια','Πεδίο ορισμού','Λογάριθμοι','Εφαρμογές'];
+const GEN=[
+ ()=>{ const a=nz(-5,5),b=ri(-9,9),x=ri(-4,5); return {tag:TAGS[0],q:`Αν f(x) = ${C(fx([[a,'x'],[b,'']]))}, πόσο είναι το f(${x});`,kind:'num',ans:a*x+b,ph:'ένας αριθμός',sol:`f(${x}) = ${pn(a)}·${pn(x)} + ${pn(b)} = ${fm(a*x+b)}.`}; },
+ ()=>{ const r=nz(-6,6),a=nz(-4,4),b=-a*r; return {tag:TAGS[0],q:`Βρες τη ρίζα της συνάρτησης f(x) = ${C(fx([[a,'x'],[b,'']]))}.`,kind:'num',ans:r,ph:'τιμή του x',sol:`Λύνουμε ${fx([[a,'x'],[b,'']])} = 0 ⇒ ${fm(a)}x = ${fm(-b)} ⇒ x = ${fm(r)}.`}; },
+ ()=>{ const a=nz(-4,4),x1=ri(-4,2),x2=x1+ri(1,4),b=ri(-5,5),y1=a*x1+b,y2=a*x2+b; return {tag:TAGS[0],q:`Η ευθεία περνά από τα σημεία A(${x1}, ${y1}) και B(${x2}, ${y2}). Ποια είναι η κλίση της;`,kind:'num',ans:a,ph:'ένας αριθμός',sol:`a = (y₂ − y₁)/(x₂ − x₁) = (${pn(y2)} − ${pn(y1)})/(${pn(x2)} − ${pn(x1)}) = ${fm(a)}.`}; },
+ ()=>{ const a1=pick([2,4,5,-2,-4,-5,1,-1]); return {tag:TAGS[0],q:`Η ευθεία ε₁ έχει κλίση ${C(fm(a1))}. Ποια κλίση έχει μια ευθεία κάθετη σε αυτήν;`,kind:'num',ans:-1/a1,ph:'αριθμός ή κλάσμα, π.χ. 0,25 ή 1/4',sol:`Για κάθετες ευθείες a₁·a₂ = −1, άρα a₂ = −1/${pn(a1)} = ${fm(-1/a1,3)}.`}; },
+ ()=>{ const x=ri(-4,4),y=ri(-6,6); let a1=nz(-3,3),a2=nz(-3,3); while(a2===a1) a2=nz(-3,3); const b1=y-a1*x,b2=y-a2*x, askX=Math.random()<.5;
+   return {tag:TAGS[0],q:`Λύσε το σύστημα ${C('y = '+fx([[a1,'x'],[b1,'']]))} και ${C('y = '+fx([[a2,'x'],[b2,'']]))}. Ποια είναι η τιμή του ${askX?'x':'y'} στη λύση;`,kind:'num',ans:askX?x:y,ph:'ένας αριθμός',
+   sol:`Εξισώνουμε: ${fx([[a1,'x'],[b1,'']])} = ${fx([[a2,'x'],[b2,'']])} ⇒ ${fm(a1-a2)}x = ${fm(b2-b1)} ⇒ x = ${fm(x)}. Τότε y = ${fm(a1)}·${pn(x)} + ${pn(b1)} = ${fm(y)}.`}; },
+ ()=>{ const t=pick(['one','none','inf']), a=nz(-3,3), b=ri(-5,5); let l1=`y = ${fx([[a,'x'],[b,'']])}`, l2, ans, sol;
+   if(t==='one'){ let a2=nz(-3,3); while(a2===a) a2=nz(-3,3); l2=`y = ${fx([[a2,'x'],[ri(-5,5),'']])}`; ans=0; sol=`Οι κλίσεις διαφέρουν (${fm(a)} ≠ ${fm(a2)}), άρα οι ευθείες τέμνονται σε ένα σημείο.`; }
+   else if(t==='none'){ let b2=ri(-5,5); while(b2===b) b2=ri(-5,5); l2=`y = ${fx([[a,'x'],[b2,'']])}`; ans=1; sol=`Ίδια κλίση και διαφορετικό b: παράλληλες ευθείες, δεν έχουν κοινό σημείο.`; }
+   else { const k=pick([2,3,-2]); l2=`${k}y = ${fx([[a*k,'x'],[b*k,'']])}`; ans=2; sol=`Διαιρώντας τη δεύτερη με ${fm(k)} παίρνουμε την πρώτη, άρα είναι η ίδια ευθεία και υπάρχουν άπειρες λύσεις.`; }
+   return {tag:TAGS[0],q:`Πόσες λύσεις έχει το σύστημα ${C(l1)} και ${C(l2)};`,kind:'choice',opts:['Μία λύση','Καμία λύση','Άπειρες λύσεις'],ans,sol}; },
+ ()=>{ const r=nz(-6,6),a=nz(-4,4),pos=a>0; return {tag:TAGS[0],q:`Ποια είναι η λύση της ανίσωσης ${C(fx([[a,'x'],[-a*r,'']])+' > 0')};`,kind:'choice',opts:shuffle([`x > ${fm(r)}`,`x < ${fm(r)}`,`x > ${fm(-r)}`,`x < ${fm(-r)}`]),ansText:pos?`x > ${fm(r)}`:`x < ${fm(r)}`,sol:`Η ρίζα είναι x = ${fm(r)}. ${pos?'Ο συντελεστής του x είναι θετικός, άρα η ανίσωση ισχύει δεξιά της ρίζας.':'Ο συντελεστής του x είναι αρνητικός, άρα διαιρώντας η φορά αλλάζει και η ανίσωση ισχύει αριστερά της ρίζας.'}`}; },
+ ()=>{ const a=nz(-3,3),xv=ri(-4,4),b=-2*a*xv,c=ri(-6,6); return {tag:TAGS[1],q:`Σε ποιο x βρίσκεται η κορυφή της παραβολής ${C('f(x) = '+fx([[a,'x²'],[b,'x'],[c,'']]))};`,kind:'num',ans:xv,ph:'τιμή του x',sol:`x_v = −b/(2a) = −${pn(b)}/(2·${pn(a)}) = ${fm(xv)}.`}; },
+ ()=>{ const a=nz(-3,3),xv=ri(-3,3),b=-2*a*xv,c=ri(-6,6),f=x=>a*x*x+b*x+c; return {tag:TAGS[1],q:`Ποια είναι η ${a>0?'ελάχιστη':'μέγιστη'} τιμή της ${C('f(x) = '+fx([[a,'x²'],[b,'x'],[c,'']]))};`,kind:'num',ans:f(xv),ph:'ένας αριθμός',sol:`Η κορυφή είναι στο x = −b/(2a) = ${fm(xv)}. Η τιμή εκεί είναι f(${fm(xv)}) = ${fm(f(xv))}.`}; },
+ ()=>{ const a=nz(-3,3),b=ri(-6,6),c=nz(-6,6),D=b*b-4*a*c; return {tag:TAGS[1],q:`Υπολόγισε τη διακρίνουσα Δ της εξίσωσης ${C(fx([[a,'x²'],[b,'x'],[c,'']])+' = 0')}.`,kind:'num',ans:D,ph:'ένας αριθμός',sol:`Δ = b² − 4ac = ${pn(b)}² − 4·${pn(a)}·${pn(c)} = ${fm(D)}.`}; },
+ ()=>{ const a=nz(-3,3),b=ri(-6,6),c=ri(-6,6),D=b*b-4*a*c, ans=D>0?0:D===0?1:2; return {tag:TAGS[1],q:`Πόσες πραγματικές ρίζες έχει η ${C(fx([[a,'x²'],[b,'x'],[c,'']])+' = 0')};`,kind:'choice',opts:['Δύο διαφορετικές','Μία διπλή','Καμία'],ans,sol:`Δ = ${pn(b)}² − 4·${pn(a)}·${pn(c)} = ${fm(D)}. ${D>0?'Δ > 0: δύο ρίζες.':D===0?'Δ = 0: μία διπλή ρίζα.':'Δ < 0: καμία πραγματική ρίζα.'}`}; },
+ ()=>{ let r1=ri(-6,5),r2=ri(-6,6); while(r2<=r1) r2=ri(-6,6); const a=pick([1,1,2,-1]); return {tag:TAGS[1],q:`Βρες τις ρίζες της ${C(fx([[a,'x²'],[-a*(r1+r2),'x'],[a*r1*r2,'']])+' = 0')}.`,kind:'set',ans:[r1,r2],ph:'δύο αριθμοί χωρισμένοι με κενό, π.χ. 2 5',sol:`Δ = ${fm((a*(r1+r2))**2-4*a*a*r1*r2)}, x = (${fm(a*(r1+r2))} ± ${fm(Math.abs(a*(r2-r1)))})/${fm(2*a)}, δηλαδή x = ${fm(r1)} και x = ${fm(r2)}.`}; },
+ ()=>{ let r1=ri(-5,4),r2=ri(-5,5); while(r2<=r1) r2=ri(-5,5); const f=`${fac(r1)}${fac(r2)}`, A=`x < ${fm(r1)} ή x > ${fm(r2)}`, Bq=`${fm(r1)} < x < ${fm(r2)}`; return {tag:TAGS[1],q:`Για ποιες τιμές του x είναι ${C('f(x) = '+f+' > 0')};`,kind:'choice',opts:shuffle([A,Bq,`x > ${fm(r1)}`,`x < ${fm(r2)}`]),ansText:A,sol:`Οι ρίζες είναι ${fm(r1)} και ${fm(r2)}. Ο συντελεστής του x² είναι θετικός, άρα η f είναι θετική έξω από τις ρίζες και αρνητική ανάμεσά τους.`}; },
+ ()=>{ const c=nz(-6,6), t=pick(['sqrt','rat','ln','sqrtneg']); const O={a:`[${fm(c)}, +∞)`,b:`(${fm(c)}, +∞)`,d:`(−∞, ${fm(c)}]`,e:`ℝ ∖ {${fm(c)}}`};
+   const m={sqrt:[sq(`x ${c>0?'−':'+'} ${Math.abs(c)}`),O.a,`Πρέπει x ${c>0?'−':'+'} ${Math.abs(c)} ≥ 0 ⇒ x ≥ ${fm(c)}.`],ln:[`ln(x ${c>0?'−':'+'} ${Math.abs(c)})`,O.b,`Πρέπει x ${c>0?'−':'+'} ${Math.abs(c)} > 0 ⇒ x > ${fm(c)}.`],rat:[`1/(x ${c>0?'−':'+'} ${Math.abs(c)})`,O.e,`Ο παρονομαστής δεν μηδενίζεται: x ≠ ${fm(c)}.`],sqrtneg:[sq(`${fm(c)} − x`),O.d,`Πρέπει ${fm(c)} − x ≥ 0 ⇒ x ≤ ${fm(c)}.`]}[t];
+   return {tag:TAGS[2],q:`Ποιο είναι το πεδίο ορισμού της ${C('f(x) = '+m[0])};`,kind:'choice',opts:shuffle(Object.values(O)),ansText:m[1],sol:m[2]}; },
+ ()=>{ const u=ri(1,4),v=ri(1,4),m=ri(1,3),n=ri(1,3),div=Math.random()<.5; return {tag:TAGS[3],q:`Αν ln a = ${u} και ln b = ${v}, πόσο είναι το ${C(`ln(a${m>1?'<sup>'+m+'</sup>':''} ${div?'/':'·'} b${n>1?'<sup>'+n+'</sup>':''})`)};`,kind:'num',ans:div?m*u-n*v:m*u+n*v,ph:'ένας αριθμός',sol:`ln(a<sup>${m}</sup>${div?'/':'·'}b<sup>${n}</sup>) = ${m}·ln a ${div?'−':'+'} ${n}·ln b = ${m}·${u} ${div?'−':'+'} ${n}·${v} = ${fm(div?m*u-n*v:m*u+n*v)}.`}; },
+ ()=>{ for(let t=0;t<200;t++){ const p=ri(-2,4),q=ri(-2,4),x0=ri(Math.max(p,-q)+1,9),c=(x0-p)*(x0+q),L=Math.max(p,-q),other=p-q-x0; if(c<=60&&c>=2&&other<=L){
+   return {tag:TAGS[3],q:`Λύσε την εξίσωση ${C(`ln(x ${p>=0?'−':'+'} ${Math.abs(p)}) + ln(x ${q>=0?'+':'−'} ${Math.abs(q)}) = ln ${c}`)}.`,kind:'num',ans:x0,ph:'η δεκτή λύση',
+   sol:`Πεδίο ορισμού: x > ${fm(L)}. Έχουμε (x ${p>=0?'−':'+'} ${Math.abs(p)})(x ${q>=0?'+':'−'} ${Math.abs(q)}) = ${c}, δηλαδή ${fx([[1,'x²'],[q-p,'x'],[-p*q-c,'']])} = 0 με ρίζες ${fm(x0)} και ${fm(other)}. Η ${fm(other)} δεν ικανοποιεί x > ${fm(L)} και απορρίπτεται.`}; } }
+   return GEN[0](); },
+ ()=>{ const Ps=ri(5,20),b=ri(1,4),d=ri(1,4),c=ri(0,30),A=c+(b+d)*Ps,askP=Math.random()<.5; return {tag:TAGS[4],q:`Ζήτηση ${C(`Q_D = ${A} − ${b}P`)} και προσφορά ${C(`Q_S = ${c} + ${d}P`)}. Ποια είναι η ${askP?'τιμή ισορροπίας P*':'ποσότητα ισορροπίας Q*'};`,kind:'num',ans:askP?Ps:A-b*Ps,ph:'ένας αριθμός',sol:`Q_D = Q_S ⇒ ${A} − ${b}P = ${c} + ${d}P ⇒ ${A-c} = ${b+d}P ⇒ P* = ${Ps}. Τότε Q* = ${A} − ${b}·${Ps} = ${A-b*Ps}.`}; },
+ ()=>{ const A=ri(20,60),b=ri(1,3),Q=ri(2,9); return {tag:TAGS[4],q:`Η αντίστροφη ζήτηση είναι ${C(`P = ${A} − ${b}Q`)}. Πόσα είναι τα συνολικά έσοδα TR όταν Q = ${Q};`,kind:'num',ans:(A-b*Q)*Q,ph:'ένας αριθμός',sol:`P(${Q}) = ${A} − ${b}·${Q} = ${A-b*Q}. TR = P·Q = ${A-b*Q}·${Q} = ${(A-b*Q)*Q}.`}; },
+ ()=>{ const q1=ri(1,8),q2=q1+ri(2,9),v=ri(0,20),A=v+q1+q2,F=q1*q2; return {tag:TAGS[4],q:`Αντίστροφη ζήτηση ${C(`P = ${A} − Q`)} και κόστος ${C(`TC = ${v}Q + ${F}`)}. Βρες τα νεκρά σημεία (Π = 0).`,kind:'set',ans:[q1,q2],ph:'δύο ποσότητες χωρισμένες με κενό',sol:`Π = (${A} − Q)Q − ${v}Q − ${F} = ${fx([[-1,'Q²'],[A-v,'Q'],[-F,'']])}. Από Π = 0: Q² − ${A-v}Q + ${F} = 0, Δ = ${(A-v)**2-4*F}, άρα Q = ${q1} ή Q = ${q2}.`}; },
+ ()=>{ const q1=ri(1,8),q2=q1+2*ri(1,5),v=ri(0,20),A=v+q1+q2,F=q1*q2, Qo=(q1+q2)/2; return {tag:TAGS[4],q:`Αντίστροφη ζήτηση ${C(`P = ${A} − Q`)} και κόστος ${C(`TC = ${v}Q + ${F}`)}. Ποιο είναι το μέγιστο κέρδος;`,kind:'num',ans:-(Qo*Qo)+(A-v)*Qo-F,ph:'ένας αριθμός',sol:`Π(Q) = ${fx([[-1,'Q²'],[A-v,'Q'],[-F,'']])}. Η κορυφή είναι στο Q = ${fm(Qo)}, όπου Π = ${fm(-(Qo*Qo)+(A-v)*Qo-F)}.`}; }
+];
+function parseNum(t){ t=String(t).trim().replace(/−/g,'-').replace(/^[A-Za-zΑ-Ωα-ω_*]+\s*=\s*/,'').replace(/,+$/,''); if(!t) return NaN; const fr=t.match(/^(-?[\d.,]+)\s*\/\s*([\d.,]+)$/); const n=s=>Number(s.replace(',','.')); if(fr) return n(fr[1])/n(fr[2]); return /^-?[\d.,]+$/.test(t)?n(t):NaN; }
+function check(q,raw){ if(q.kind==='num'){ const v=parseNum(raw); return isFinite(v)&&Math.abs(v-q.ans)<=0.011; }
+  if(q.kind==='set'){ const toks=String(raw).split(/[;\s]+|και|ή/).filter(Boolean).map(parseNum); if(toks.length!==q.ans.length||toks.some(v=>!isFinite(v))) return false; const a=[...toks].sort((x,y)=>x-y),b=[...q.ans].sort((x,y)=>x-y); return a.every((v,i)=>Math.abs(v-b[i])<=0.011); } return false; }
+
+MODS.push({id:'quiz',group:'Εξάσκηση',nav:'Κουίζ',mount(el){
+  let topic='all',cur=null,done=false,tried=false,lastQ='';
+  const next=()=>{ let q,tries=0; do{ q=pick(GEN)(); tries++; }while((topic!=='all'&&q.tag!==topic||q.q===lastQ)&&tries<400); lastQ=q.q; cur=q; done=false; tried=false;
+    if(q.kind==='choice'){ if(q.ansText!==undefined) q.ans=q.opts.indexOf(q.ansText); } paint(); };
+  const total=()=>`<div class="qstats"><span>Σωστές <b>${stats.ok}</b> από <b>${stats.tot}</b></span><span>Σερί <b>${stats.streak}</b></span><span>Ρεκόρ <b>${stats.best}</b></span><button type="button" class="btn" id="qreset">Μηδενισμός</button></div>`;
+  function refreshStats(){ el.querySelector('#qstats').innerHTML=total(); el.querySelector('#qreset').onclick=()=>{ stats={ok:0,tot:0,streak:0,best:0}; saveStats(); updateScore(); refreshStats(); }; }
+  function record(ok){ stats.tot++; if(ok){ stats.ok++; stats.streak++; stats.best=Math.max(stats.best,stats.streak); } else stats.streak=0; saveStats(); updateScore(); }
+  function showAns(q){ return q.kind==='choice'?q.opts[q.ans]:q.kind==='set'?q.ans.map(v=>fm(v,3)).join(' και '):fm(q.ans,3); }
+  function feedback(ok,reveal){ const q=cur, f=$('#fb'); const act=$('#qacts');
+    if(ok){ f.className='fb ok'; f.innerHTML=`<b class="t">Σωστά!</b><p>Λύση: ${q.sol}</p>`; }
+    else if(reveal){ f.className='fb no'; f.innerHTML=`<b class="t">Σωστή απάντηση: ${showAns(q)}</b><p>Λύση: ${q.sol}</p>`; }
+    else { f.className='fb no'; f.innerHTML=`<b class="t">Δεν είναι σωστό.</b><p>${q.kind==='num'||q.kind==='set'?'Έλεγξε τους υπολογισμούς σου και δοκίμασε ξανά, ή δες τη λύση.':'Δοκίμασε άλλη επιλογή ή δες τη λύση.'}</p>`; }
+    f.hidden=false; act.querySelector('[data-a="sol"]').hidden=ok||reveal; act.querySelector('[data-a="next"]').hidden=!(ok||reveal); }
+  function paint(){ const q=cur;
+    const body=q.kind==='choice'
+      ? `<div class="opts" id="opts">${q.opts.map((o,i)=>`<button type="button" data-i="${i}">${o}</button>`).join('')}</div>`
+      : `<form class="qform" id="qform" autocomplete="off"><div class="f"><label for="qin">Η απάντησή σου</label><input id="qin" type="text" inputmode="text" placeholder="${q.ph}" spellcheck="false"></div><button class="btn primary" type="submit">Έλεγχος</button></form>`;
+    el.querySelector('#qcard').innerHTML=`<span class="chip warn" style="align-self:flex-start">${q.tag}</span><p class="qq">${q.q}</p>${body}<div class="fb" id="fb" hidden aria-live="polite"></div>
+     <div class="qacts" id="qacts"><button type="button" class="btn" data-a="sol" hidden>Δες τη λύση</button><button type="button" class="btn primary" data-a="next" hidden>Επόμενη ερώτηση</button><button type="button" class="btn" data-a="skip">Παράλειψη</button></div>`;
+    refreshStats();
+    const act=el.querySelector('#qacts');
+    act.querySelector('[data-a="next"]').onclick=next; act.querySelector('[data-a="skip"]').onclick=next;
+    act.querySelector('[data-a="sol"]').onclick=()=>{ if(!tried){ record(false); tried=true; } done=true; markDone(); feedback(false,true); refreshStats(); };
+    const markDone=()=>{ const f=el.querySelector('#qform'); if(f){ f.querySelector('input').disabled=true; f.querySelector('button').disabled=true; } el.querySelectorAll('#opts button').forEach((b,i)=>{ b.disabled=true; if(i===q.ans) b.classList.add('right'); }); };
+    const result=ok=>{ if(!tried){ record(ok); tried=true; } if(ok){ done=true; markDone(); } feedback(ok,false); refreshStats(); };
+    if(q.kind==='choice') el.querySelectorAll('#opts button').forEach(b=>b.onclick=()=>{ const i=+b.dataset.i, ok=i===q.ans; if(!ok){ b.classList.add('wrong'); b.disabled=true; } result(ok); });
+    else { const form=el.querySelector('#qform'); form.onsubmit=e=>{ e.preventDefault(); const v=form.querySelector('input').value; if(!v.trim()){ return; } result(check(q,v)); }; form.querySelector('input').focus({preventScroll:true}); }
+  }
+  el.innerHTML=`<section class="lab"><div><h2>Κουίζ εξάσκησης</h2><p class="lead">Τυχαίες ερωτήσεις από όλα τα θέματα της συνάντησης. Οι αριθμοί αλλάζουν κάθε φορά, άρα μπορείς να επαναλαμβάνεις όσο θέλεις.</p></div>
+   <div class="howto"><b>Οδηγίες</b><ol class="steps"><li>Διάλεξε θέμα ή «Όλα» και διάβασε την ερώτηση.</li><li>Λύσε την με χαρτί και μολύβι. Γράψε την απάντηση στο πεδίο (δεκαδικοί με κόμμα ή τελεία, κλάσματα όπως 1/2). Όταν ζητούνται δύο τιμές, χώρισέ τες με κενό.</li><li>Πάτα «Έλεγχος». Αν σφάλλεις, δοκίμασε ξανά ή δες τη λύση. Στη βαθμολογία μετράει η πρώτη προσπάθεια.</li></ol></div>
+   <div class="seg" id="qtopics"></div><div id="qcard" class="qcard"></div><div id="qstats"></div></section>`;
+  const tp=el.querySelector('#qtopics'); tp.innerHTML=[['all','Όλα'],...TAGS.map(t=>[t,t])].map(([v,t])=>`<button type="button" data-v="${v}" aria-pressed="${v===topic}">${t}</button>`).join('');
+  tp.querySelectorAll('button').forEach(b=>b.onclick=()=>{ topic=b.dataset.v; tp.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b)); next(); });
+  next();
+}});
+</script>
+<script>
+updateScore();
+open((location.hash||'').slice(1)||MODS[0].id);
+addEventListener('hashchange',()=>{ const id=location.hash.slice(1); if(MODS.some(m=>m.id===id)) open(id); });
+</script>
+
+</body>
+</html>

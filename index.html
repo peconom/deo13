@@ -1,0 +1,128 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Εργαστήριο Μαθηματικών ΔΕΟ13</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:wght@600;700&display=swap">
+<style>
+/* Home: left-aligned editorial page; sections separated by hairlines; facts as a definition grid. */
+:root{
+  --bg:#EEF3F9; --surface:#FFFFFF; --ink:#0E1A2B; --ink2:#51627A; --line:#D3DDEA; --grid:#E4EBF4;
+  --blue:#0B5CA8; --blue-soft:#DCEAF8; --red:#C23B2E; --red-soft:#F8E1DE;
+  --green:#1B8A57; --green-soft:#DCF2E6; --amber:#A8700F; --chip:#E3ECF7;
+  --serif:'Source Serif 4',Georgia,'Times New Roman',serif;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0B1320; --surface:#121D2F; --ink:#E8EFF8; --ink2:#9BAEC8; --line:#26354D; --grid:#1B283D;
+  --blue:#62AAF2; --blue-soft:#17304F; --red:#F28A7E; --red-soft:#3D2227;
+  --green:#4FC48B; --green-soft:#15352B; --amber:#E6B04B; --chip:#1A2A43; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B1320; --surface:#121D2F; --ink:#E8EFF8; --ink2:#9BAEC8; --line:#26354D; --grid:#1B283D;
+  --blue:#62AAF2; --blue-soft:#17304F; --red:#F28A7E; --red-soft:#3D2227;
+  --green:#4FC48B; --green-soft:#15352B; --amber:#E6B04B; --chip:#1A2A43; color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--sans);padding-inline:16px;padding-block:20px 56px}
+.app{max-width:1060px;margin-inline:auto;display:flex;flex-direction:column;gap:36px}
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 20px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:6px 8px 6px 16px}
+.brand{font:600 16px var(--serif);color:var(--ink);text-decoration:none;display:flex;align-items:baseline;gap:10px}
+.brand small{font:500 11px var(--mono);letter-spacing:.14em;color:var(--blue)}
+.oss{display:flex;gap:4px;overflow-x:auto;max-width:100%}
+.oss a{padding:8px 14px;border-radius:8px;color:var(--ink);text-decoration:none;font:500 13px var(--mono);letter-spacing:.04em;white-space:nowrap}
+.oss a:hover{background:var(--chip)} .oss a[aria-current="page"]{background:var(--blue);color:#fff;font-weight:600}
+.oss a:focus-visible,.brand:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+h1{font:700 clamp(30px,5vw,46px)/1.1 var(--serif);margin:10px 0 14px;text-wrap:balance;max-width:20ch}
+h2{font:700 24px/1.2 var(--serif);margin:0 0 12px;text-wrap:balance}
+h3{font:600 17px/1.3 var(--serif);margin:0 0 6px}
+p{margin:0 0 10px;max-width:68ch} .lead{font-size:17px;color:var(--ink2);max-width:60ch}
+.eyebrow{font:500 12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--blue)}
+.sec{border-top:1px solid var(--line);padding-top:22px;display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:8px 32px}
+.sec>.label{font:500 12px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink2);padding-top:6px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+ul.plain{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px} ul.plain li::marker{color:var(--blue)}
+ol.steps{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px;max-width:68ch} ol.steps li::marker{color:var(--blue);font:500 14px var(--mono)}
+.note{background:var(--chip);border-radius:10px;padding:10px 14px;font-size:14px;color:var(--ink2);margin-top:12px;max-width:68ch}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:8px;text-decoration:none;color:var(--ink);min-width:0}
+a.card:hover{border-color:var(--blue)} a.card:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.card .k{font:500 12px var(--mono);letter-spacing:.1em;color:var(--blue)}
+.card p{margin:0;font-size:14px;color:var(--ink2)}
+.chip{align-self:flex-start;font:500 12px var(--mono);padding:3px 10px;border-radius:999px}
+.chip.on{background:var(--green-soft);color:var(--green)} .chip.wip{background:var(--chip);color:var(--amber)}
+.card.wip{background:transparent;border-style:dashed}
+dl.facts{margin:0;display:grid;grid-template-columns:minmax(0,170px) minmax(0,1fr);gap:0}
+dl.facts dt,dl.facts dd{margin:0;padding:10px 0;border-bottom:1px solid var(--line)}
+dl.facts dt{font:500 13px var(--mono);color:var(--ink2);padding-right:16px}
+.areas{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:18px}
+.area{border-left:3px solid var(--blue);padding:2px 0 2px 14px} .area small{display:block;font:500 12px var(--mono);color:var(--ink2);margin-bottom:4px} .area p{font-size:14px;margin:0}
+a{color:var(--blue)} .oss a,.brand,a.card{color:inherit}
+.oss a[aria-current="page"]{color:#fff}
+@media (max-width:760px){.sec{grid-template-columns:minmax(0,1fr)} dl.facts{grid-template-columns:minmax(0,1fr)} dl.facts dt{border-bottom:0;padding-bottom:0} }
+</style>
+<div class="app">
+  <div class="topbar">
+    <a class="brand" href="index.html"><small>ΔΕΟ13</small>Ποσοτικές Μέθοδοι</a>
+    <div class="oss" role="navigation" aria-label="Ομαδικές Συμβουλευτικές Συναντήσεις">
+      <a href="index.html" aria-current="page">Αρχική</a><a href="oss1.html">ΟΣΣ1</a><a href="oss2.html">ΟΣΣ2</a><a href="oss3.html">ΟΣΣ3</a><a href="oss4.html">ΟΣΣ4</a>
+    </div>
+  </div>
+  <header>
+    <div class="eyebrow">ΔΕΟ13 · Ποσοτικές Μέθοδοι</div>
+    <h1>Διαδραστικό εργαστήριο για τις ΟΣΣ</h1>
+    <p class="lead">Μία σελίδα ανά Ομαδική Συμβουλευτική Συνάντηση, με ρυθμιστικά, γραφήματα και κουίζ που δείχνουν στην πράξη τα εργαλεία του μαθήματος.</p>
+  </header>
+
+  <section class="sec"><div class="label">Σκοπός</div><div>
+    <h2>Τι κάνει αυτός ο ιστότοπος</h2>
+    <p>Συνοδεύει τις Ομαδικές Συμβουλευτικές Συναντήσεις (ΟΣΣ) της θεματικής ενότητας ΔΕΟ13 Ποσοτικές Μέθοδοι. Τα βασικά εργαλεία κάθε συνάντησης γίνονται διαδραστικά παραδείγματα, ώστε να βλέπεις αμέσως τι αλλάζει στον τύπο και στο γράφημα όταν αλλάζει μια παράμετρος.</p>
+    <div class="cols" style="margin-top:14px">
+      <div><h3>Τι προσφέρει</h3><ul class="plain"><li>Εργαστήρια με ρυθμιστικά και γραφήματα με ζουμ.</li><li>Οδηγίες και αυτόματη ερμηνεία για τις τιμές που διαλέγεις.</li><li>Κουίζ με τυχαίες ερωτήσεις και έλεγχο της απάντησής σου.</li></ul></div>
+      <div><h3>Τι δεν είναι</h3><ul class="plain"><li>Δεν αντικαθιστά το εκπαιδευτικό υλικό και το study.eap.gr.</li><li>Δεν περιέχει λύσεις των Γραπτών Εργασιών.</li><li>Δεν αποτελεί επίσημη ανακοίνωση του ΕΑΠ.</li></ul></div>
+    </div>
+  </div></section>
+
+  <section class="sec"><div class="label">Οδηγίες</div><div>
+    <h2>Πώς να τον χρησιμοποιήσεις</h2>
+    <ol class="steps">
+      <li>Διάλεξε τη συνάντηση από το μενού στο πάνω μέρος.</li>
+      <li>Διάβασε το πλαίσιο «Οδηγίες» κάθε εργαστηρίου και κίνησε τα ρυθμιστικά. Στο γράφημα χρησιμοποίησε τη ροδέλα ή τα κουμπιά + και − για ζουμ και σύρε για μετακίνηση.</li>
+      <li>Διάβασε την «Ερμηνεία», που ξαναγράφεται για τις τιμές που έχεις επιλέξει.</li>
+      <li>Λύσε με χαρτί και μολύβι τις ερωτήσεις του κουίζ και έλεγξε την απάντησή σου. Αν σφάλεις, δοκίμασε ξανά ή δες τη λύση.</li>
+    </ol>
+    <p class="note">Το σκορ του κουίζ αποθηκεύεται μόνο στον φυλλομετρητή σου και δεν το βλέπει ο Καθηγητής-Σύμβουλος.</p>
+  </div></section>
+
+  <section class="sec"><div class="label">Συναντήσεις</div><div>
+    <h2>Διάλεξε ΟΣΣ</h2>
+    <div class="cards">
+      <a class="card" href="oss1.html"><span class="k">ΟΣΣ1</span><span class="chip on">Διαθέσιμη</span><p>Βασικά εργαλεία των Επιχειρησιακών Μαθηματικών: πεδίο ορισμού, ευθείες και συστήματα, δευτεροβάθμια, λογάριθμοι, προσφορά και ζήτηση, κέρδος. Οκτώ εργαστήρια και κουίζ.</p></a>
+      <a class="card wip" href="oss2.html"><span class="k">ΟΣΣ2</span><span class="chip wip">Υπό κατασκευή</span><p>Το υλικό θα προστεθεί όταν ολοκληρωθεί.</p></a>
+      <a class="card wip" href="oss3.html"><span class="k">ΟΣΣ3</span><span class="chip wip">Υπό κατασκευή</span><p>Το υλικό θα προστεθεί όταν ολοκληρωθεί.</p></a>
+      <a class="card wip" href="oss4.html"><span class="k">ΟΣΣ4</span><span class="chip wip">Υπό κατασκευή</span><p>Το υλικό θα προστεθεί όταν ολοκληρωθεί.</p></a>
+    </div>
+  </div></section>
+
+  <section class="sec"><div class="label">Το μάθημα</div><div>
+    <h2>Η ΔΕΟ13 με μια ματιά</h2>
+    <p>Η θεματική ενότητα εισάγει στη συστημική ανάλυση και επίλυση προβλημάτων της Διοίκησης Επιχειρήσεων με μαθηματικές μεθόδους, και στις βασικές ποσοτικές μεθόδους, τεχνικές και εργαλεία.</p>
+    <dl class="facts" style="margin-top:12px">
+      <dt>Πρόγραμμα</dt><dd>ΠΣ ΔΕΟ, Σχολή Κοινωνικών Επιστημών, προπτυχιακό, 1ο έτος</dd>
+      <dt>Πιστωτικές μονάδες</dt><dd>20 ECTS</dd>
+      <dt>ΟΣΣ</dt><dd>5 ανά ακαδημαϊκό έτος, 4 ώρες η καθεμία, Σάββατο ή Κυριακή, δια ζώσης ή ηλεκτρονικά</dd>
+      <dt>Γραπτές εργασίες</dt><dd>4, με 4 έως 5 θέματα η καθεμία. Όλα τα θέματα πρέπει να απαντηθούν.</dd>
+      <dt>Εξέταση</dt><dd>5 ισοδύναμα θέματα, απαντάς σε 4. Κλειστά βιβλία, με τυπολόγια που διανέμονται.</dd>
+      <dt>Τελικός βαθμός</dt><dd>70% από τη γραπτή εξέταση και 30% από τον μέσο όρο των 4 εργασιών. Το 30% προσμετράται μόνο αν η τελική ή η επαναληπτική εξέταση είναι προβιβάσιμη.</dd>
+    </dl>
+    <div class="areas">
+      <div class="area"><small>Επιχειρησιακά Μαθηματικά</small><p>Συναρτήσεις, όρια, παράγωγοι και ολοκληρώματα μίας μεταβλητής, εξισώσεις και ανισώσεις, βελτιστοποίηση, γραφήματα με Excel, εφαρμογές στην Οικονομία και τη Διοίκηση.</p></div>
+      <div class="area"><small>Επιχειρησιακή Στατιστική</small><p>Περιγραφική στατιστική, πιθανότητες, τυχαίες μεταβλητές και κατανομές, διαστήματα εμπιστοσύνης, έλεγχοι υποθέσεων, απλή γραμμική παλινδρόμηση.</p></div>
+      <div class="area"><small>Επιχειρησιακή Έρευνα</small><p>Γραμμικός προγραμματισμός (γραφική επίλυση, Simplex, Excel, Ουγγρική μέθοδος), δικτυωτή ανάλυση, θεωρία παιγνίων, ουρές αναμονής.</p></div>
+    </div>
+    <p class="note">Τα στοιχεία προέρχονται από το <a href="https://www.eap.gr/wp-content/uploads/2021/02/%CE%A0%CE%B5%CF%81%CE%AF%CE%B3%CF%81%CE%B1%CE%BC%CE%BC%CE%B1-%CE%98%CE%95-%CE%94%CE%95%CE%9F-13-min.pdf" target="_blank" rel="noopener">περίγραμμα της ΔΕΟ13 στον ιστότοπο του ΕΑΠ</a> και ενδέχεται να έχουν αλλάξει. Ισχύουν όσα ανακοινώνονται στο study.eap.gr και από τον Καθηγητή-Σύμβουλο του τμήματός σου.</p>
+  </div></section>
+</div>
+
+</body></html>
